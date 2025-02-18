@@ -119,8 +119,37 @@ void ecef_to_enu(double x, double y, double z, double lat0, double lon0, double 
     *yNorth = -cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd;
     *zUp = cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd;
 }
+/******************************************************************************************************************
+    Converts the geodetic WGS-84 coordinated (lat, lon, h) to 
+    East-North-Up coordinates in a Local Tangent Plane that is centered at the 
+    (WGS-84) Geodetic point (lat0, lon0, h0).
+    
+    :param lat: latitude of target in degrees
+    :param lon: longitude of target in degrees
+    :param h: height of target in meters
+    :param lat0: latitude of origin in degrees
+    :param lon0: longitude of origin in degrees
+    :param h0: height of origin meters
+    :output: (xEast, yNorth, zUp) in [meters, meters, meters]
+*******************************************************************************************************************/
+void geodetic_to_enu(float lat, float lon, float h, float lat0, float lon0, float h0, float *xEast, float *yNorth, float *zUp) 
+{
+    float x, y, z;
+    geodetic_to_ecef(lat, lon, h, &x, &y, &z);
+    ecef_to_enu(x, y, z, lat0, lon0, h0, xEast, yNorth, zUp);
+}
+/******************************************************************************************************************
+    South African Coordinate Reference System (Hartebeesthoek94) to Geodetic
+    From "CDNGI Coordinate Conversion Utility v1 Sep 2009.xls".
+    CM = central meridian
 
-void sacrs_to_geodetic(int loMeridian, int yWesting, int xSouthing, double *lat, double *lon) {
+    :param loMeridian: central meridian (Lo.) degrees
+    :param yWesting: coordinates measured in meters from the CM of the respective zone, increasing from the CM (where Y=0) in a westerly direction. Y is +ve west of the CM and -ve east of the CM.
+    :param xSouthing: coordinates measured in meters southwards from the equator, increasing from the equator (where X = 0m) towards the South Pole.
+    :output: (lat, lon) in [degree, degree]
+*******************************************************************************************************************/
+void sacrs_to_geodetic(int loMeridian, int yWesting, int xSouthing, double *lat, double *lon) 
+{
     double loMeridianRadians;
     deg2rad(loMeridian, &loMeridianRadians);
     
@@ -155,7 +184,13 @@ void sacrs_to_geodetic(int loMeridian, int yWesting, int xSouthing, double *lat,
     rad2deg(latRadians, lat);
     rad2deg(lonRadians, lon);
 }
-
+/******************************************************************************************************************
+    Geodetic to South African Coordinate Reference System 
+   
+    :param lat: latitude in degrees
+    :param lon: longitude in degrees
+    :output: (loMeridian, yWesting, xSouthing) in [degree, meters, meters]
+*******************************************************************************************************************/
 Coordinate geodetic_to_sacrs(float lat, float lon) 
 {
     float a = 6378137.0; // semi-major axis
