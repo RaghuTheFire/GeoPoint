@@ -55,7 +55,14 @@ void geodetic_to_ecef(double lat, double lon, double height, double *x, double *
     *y = (height + N) * cos_lambda * sin_phi;
     *z = (height + (1 - e_sq) * N) * sin_lambda;
 }
-
+/******************************************************************************************************************
+ Converts Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to the WGS-84 Geodetic point (lat, lon, height)
+    
+    :param x: meters
+    :param y: meters
+    :param z: meters
+    :output: (lat, lon, height) in [degrees, degrees, meters]
+*******************************************************************************************************************/
 void ecef_to_geodetic(double x, double y, double z, double *lat, double *lon, double *height) 
 {
     double eps = e_sq / (1.0 - e_sq);
@@ -74,6 +81,19 @@ void ecef_to_geodetic(double x, double y, double z, double *lat, double *lon, do
     rad2deg(lambd, lon);
 }
 
+/******************************************************************************************************************
+    Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) to 
+    East-North-Up coordinates in a Local Tangent Plane that is centered at the 
+    (WGS-84) Geodetic point (lat0, lon0, h0).
+    
+    :param x: meters
+    :param y: meters
+    :param z: meters
+    :param lat0: latitude in degrees
+    :param lon0: longitude in degrees
+    :param height0: meters
+    :output: (xEast, yNorth, zUp) in [meters, meters, meters]
+*******************************************************************************************************************/
 void ecef_to_enu(double x, double y, double z, double lat0, double lon0, double h0, double *xEast, double *yNorth, double *zUp) 
 {
     double lamb, phi, s, N;
